@@ -8,19 +8,10 @@ import (
 
 	"github.com/noilpa/umbot/internal/app"
 	"github.com/noilpa/umbot/internal/config"
+	"github.com/noilpa/umbot/internal/messenger/telegram"
+	"github.com/noilpa/umbot/internal/storage/redis"
 	"github.com/noilpa/umbot/internal/weather/wttrin"
 )
-
-// umbot - umbrella bot for telegram.
-// umbot remind for you to take umbrella
-// in case of rainy weather.
-
-// api
-// --------------------
-// set location
-// set remind time
-// get predict now
-// check location exist
 
 func main() {
 	cfg := config.New()
@@ -33,11 +24,11 @@ func main() {
 	log.SetLevel(lvl)
 	ctx := ctxlog.With(context.Background(), logrus.NewEntry(log))
 
-	wttrin.New(cfg.Wttrin.Host, cfg.Wttrin.Format)
-
 	a := app.New(
 		cfg,
 		wttrin.New(cfg.Wttrin.Host, cfg.Wttrin.Format),
+		telegram.New(cfg.Telegram),
+		redis.New(),
 	)
 	a.Run(ctx)
 }

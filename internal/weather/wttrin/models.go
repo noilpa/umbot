@@ -1,10 +1,5 @@
 package wttrin
 
-type Config struct {
-	Host   string
-	Format string
-}
-
 type WttrinResponse struct {
 	CurrentCondition []struct {
 		Feelslikec       string `json:"FeelsLikeC"`

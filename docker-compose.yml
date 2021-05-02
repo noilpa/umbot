@@ -1,0 +1,11 @@
+services:
+  server:
+    build .
+    links:
+      - redis
+  redis:
+    image: redis
+    volumes:
+    - /redis/data:/data
+volumes:
+# директория для редиса
