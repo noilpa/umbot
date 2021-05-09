@@ -1,6 +1,6 @@
 services:
   server:
-    build: .
+    image: noilpa/umbot:1.0.0
     links:
       - redis
   redis:

@@ -30,7 +30,7 @@ func New() Config {
 			PollingTimeout: 10 * time.Second,
 		},
 		Storage: redis.Config{
-			Address:  "localhost:6379",
+			Address:  "redis:6379",
 			Login:    "",
 			Password: "",
 		},
