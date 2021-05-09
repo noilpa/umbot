@@ -23,14 +23,14 @@ type Client struct {
 	format string
 }
 
-func New(host, format string) *Client {
-	h, err := url.Parse(host)
+func New(c Config) *Client {
+	h, err := url.Parse(c.Host)
 	if err != nil {
 		panic(err)
 	}
 	return &Client{
 		host:   h,
-		format: format,
+		format: c.Format,
 		cli: &http.Client{
 			Transport: &http.Transport{
 				IdleConnTimeout: 5 * time.Second,

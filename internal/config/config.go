@@ -10,7 +10,6 @@ import (
 
 type Config struct {
 	Threshold int
-	Location  string
 	LogLeveL  string
 	Wttrin    wttrin.Config
 	Telegram  telegram.Config
@@ -20,7 +19,6 @@ type Config struct {
 func New() Config {
 	return Config{
 		Threshold: 70,
-		Location:  "48.834,2.394", // most precision method - Latitude and longitude in 48.834,2.394 format
 		LogLeveL:  "info",
 		Wttrin: wttrin.Config{
 			Host:   "http://wttr.in",
@@ -32,9 +30,9 @@ func New() Config {
 			PollingTimeout: 10 * time.Second,
 		},
 		Storage: redis.Config{
-			Address:  "localhost",
-			Login:    "redis",
-			Password: "redis",
+			Address:  "localhost:6379",
+			Login:    "",
+			Password: "",
 		},
 	}
 }

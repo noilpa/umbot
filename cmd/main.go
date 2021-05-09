@@ -26,9 +26,9 @@ func main() {
 
 	a := app.New(
 		cfg,
-		wttrin.New(cfg.Wttrin.Host, cfg.Wttrin.Format),
+		wttrin.New(cfg.Wttrin),
 		telegram.New(cfg.Telegram),
-		redis.New(),
+		redis.New(cfg.Storage),
 	)
 	a.Run(ctx)
 }

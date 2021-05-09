@@ -1,11 +1,9 @@
 services:
   server:
-    build .
+    build: .
     links:
       - redis
   redis:
-    image: redis
+    image: redis:6.2.3
     volumes:
-    - /redis/data:/data
-volumes:
-# директория для редиса
+    - /redis:/redis

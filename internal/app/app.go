@@ -2,6 +2,10 @@ package app
 
 import (
 	"context"
+	"net/http"
+
+	"github.com/noilpa/ctxlog"
+	"github.com/sirupsen/logrus"
 
 	"github.com/noilpa/umbot/internal/config"
 	"github.com/noilpa/umbot/internal/messenger/telegram"
@@ -27,13 +31,42 @@ func New(cfg config.Config, weatherCli weather.IWeather, tg telegram.Telegram, s
 
 func (a *App) Run(ctx context.Context) {
 	a.tgBot.InitHandlers(map[string]interface{}{
-		"/help": a.help(ctx),
-		//"/start":    nil,            // start sending everyday notification
+		"/help":  a.helpCommand(ctx),
+		"/start": a.startCommand(ctx), // start sending everyday notification
 		//"/stop":     nil,            // stop sending everyday notifications
-		//"/location": nil,            // set location for current user
+		"/location": a.locationCommand(ctx), // set location for current user
 		//"/remind":   nil,            // set remind time for current user
-		"/weather": a.weather(ctx), // get current weather
+		"/weather": a.weatherCommand(ctx), // get current weather
 	})
 
+	mux := http.NewServeMux()
+	mux.HandleFunc("/check", withLog(ctxlog.From(ctx),
+		func(w http.ResponseWriter, r *http.Request) {
+			if r.Method != http.MethodGet {
+				w.WriteHeader(http.StatusNotFound)
+				return
+			}
+			header := http.StatusOK
+			if _, err := w.Write([]byte("OK")); err != nil {
+				ctxlog.From(r.Context()).WithError(err).Error("health check failed")
+				header = http.StatusInternalServerError
+			}
+			w.WriteHeader(header)
+		}))
+
+	go func(ctx context.Context) {
+		if err := http.ListenAndServe(":8888", mux); err != nil {
+			ctxlog.From(ctx).WithError(err).Error("http server failed")
+		}
+	}(ctx)
+
 	a.tgBot.Bot.Start()
+}
+
+func withLog(log *logrus.Entry, h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		r.WithContext(ctxlog.With(r.Context(), log))
+		log.Info(r.Method, r.RequestURI)
+		h.ServeHTTP(w, r)
+	}
 }
